@@ -10,3 +10,5 @@ data:
   # Kafka Configs
   KAFKA_BOOTSTRAP_SERVERS: {{ .Release.Name }}-kafka.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.kafka.service.ports.client }}
   KAFKA_TOPIC: {{ (index .Values.kafka.provisioning.topics 0).name }}
+  MANAGEMENT_API_URL: http://{{ .Release.Name }}-management-api.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.managementApi.service.port }}
+

@@ -4,7 +4,7 @@ fullnameOverride: ""
 
 managementApi:
   replicaCount: 1
-  logLevel: info
+  logLevel: INFO
 
   podAnnotations: {}
   podLabels: {}
@@ -17,9 +17,9 @@ managementApi:
   affinity: {}
 
   image:
-    repository: nginx
+    repository: management-api
     pullPolicy: IfNotPresent
-    tag: ""
+    tag: "1.0.0"
 
   serviceAccount:
     create: true
@@ -78,7 +78,7 @@ managementApi:
 
 webServer:
   replicaCount: 1
-  logLevel: info
+  logLevel: INFO
 
   podAnnotations: {}
   podLabels: {}
@@ -91,9 +91,9 @@ webServer:
   affinity: {}
 
   image:
-    repository: nginx
+    repository: web-server
     pullPolicy: IfNotPresent
-    tag: ""
+    tag: "1.0.0"
 
   serviceAccount:
     create: true

@@ -7,11 +7,11 @@ logger = get_logger(__name__)
 
 
 async def init_mongo(app: FastAPI):
-    mongo_uri = f"mongodb://{settings.MONGO_HOST}:{settings.MONGO_PORT}/"
+    mongo_uri = f"mongodb://{settings.MONGO_HOSTNAME}:{settings.MONGO_PORT}/"
     logger.info(f"Connecting to MongoDB at {mongo_uri}...")
 
     try:
-        client = AsyncIOMotorClient(settings.mongo_uri)
+        client = AsyncIOMotorClient(mongo_uri)
 
         await client.server_info()
 

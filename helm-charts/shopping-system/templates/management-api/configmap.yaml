@@ -13,7 +13,7 @@ data:
   KAFKA_GROUP_ID: {{ .Values.managementApi.config.kafka.consumerGroup }}
 
   # Mongo Configs
-  MONGO_HOSTNAME: "mongodb://{{ .Release.Name }}-mongodb.{{ .Release.Namespace }}.svc.cluster.local"
+  MONGO_HOSTNAME: {{ .Release.Name }}-mongodb.{{ .Release.Namespace }}.svc.cluster.local
   MONGO_PORT: "{{ .Values.mongodb.service.ports.mongodb }}"
   MONGO_DB_NAME: {{ .Values.managementApi.config.mongodb.database }}
   MONGO_COLLECTION_NAME: {{ .Values.managementApi.config.mongodb.collection }}
