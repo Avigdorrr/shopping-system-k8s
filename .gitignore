@@ -297,4 +297,4 @@ __marimo__/
 
 # Helm
 Chart.lock
-charts/*.tgz
+**/charts/*.tgz
