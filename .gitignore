@@ -294,3 +294,7 @@ http-client.private.env.json
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Helm
+Chart.lock
+charts/*.tgz
