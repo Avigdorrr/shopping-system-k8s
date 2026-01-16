@@ -8,6 +8,7 @@ from core.logger import get_logger
 router = APIRouter(tags=["Buys"])
 logger = get_logger("web-server-router")
 
+
 class PurchaseRequest(BaseModel):
     username: str
     userid: str
@@ -23,7 +24,7 @@ async def buy_item(purchase: PurchaseRequest, request: Request):
     producer = request.app.state.kafka_producer
 
     try:
-        purchase_data : dict = purchase.model_dump()
+        purchase_data: dict = purchase.model_dump()
         purchase_data['timestamp'] = time.time()
 
         logger.info(f"Producing event: {purchase_data}")

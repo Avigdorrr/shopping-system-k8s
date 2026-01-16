@@ -1,0 +1,189 @@
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+managementApi:
+  replicaCount: 1
+  logLevel: info
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  volumes: []
+  volumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /-/healthy
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /-/ready
+      port: http
+
+  kedaAutoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5 # make sure this is equal to the number of partitions in the Kafka topic
+    pollingInterval: 30
+    cooldownPeriod: 300
+    kafkaLagThreshold: 10
+
+  config:
+    mongodb:
+      collection: purchases
+      database: shopping
+    kafka:
+      consumerGroup: management-api-group
+
+
+
+webServer:
+  replicaCount: 1
+  logLevel: info
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  volumes: []
+  volumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  service:
+    type: ClusterIP
+    port: 8081
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /-/healthy
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /-/ready
+      port: http
+
+  kedaAutoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5 
+    pollingInterval: 30
+    cooldownPeriod: 300
+    kafkaLagThreshold: "10"
+
+kafka:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/kafka
+    tag: 3.8.1
+  service:
+    ports:
+      client: 9092
+  provisioning:
+    topics:
+      - name: purchases
+        partitions: 5
+        replicas: 1
+  listeners:
+    client:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    
+mongodb:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/mongodb
+    tag: latest
+  service:
+    ports:
+      mongodb: 27017
+  auth:
+    enabled: false
+  # auth:
+  #   database: shopping
+
+# used only if kafka.enabled is false
+# externalKafka:
+#   bootstrapServers: "kafka:9092"
+#   topic: purchases
+
+# used only if mongo.enabled is false
+# externalMongodb:
+#   connectionString: "mongodb://mongo:27017"
+#   database: shopping
+#   collection: purchases

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, status, HTTPException
 
 router = APIRouter(tags=["Operations"])
 
-@router.get("/health")
+@router.get("/healthy")
 async def liveness_probe():
     return {"status": "alive"}
 

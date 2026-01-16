@@ -133,13 +133,13 @@ readinessProbe:
     path: /
     port: http
 
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
-autoscaling:
-  enabled: false
+kedaAutoscaling:
+  enabled: true
   minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  maxReplicas: 5
+  pollingInterval: 30
+  cooldownPeriod: 300
+  kafkaLagThreshold: "10"
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -159,3 +159,13 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+config:
+  kafka:
+    bootstrapServers: kafka-service:9092
+    topic: purchases
+    consumerGroup: management-api-group
+  mongo:
+    connectionString: "mongodb://mongo:27017"
+    database: shopping
+    collection: purchases

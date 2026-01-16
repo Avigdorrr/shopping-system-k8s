@@ -1,0 +1,9 @@
+dependencies:
+- name: kafka
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 30.1.8
+- name: mongodb
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 16.5.45
+digest: sha256:d9ff4da43acd0a8cf667d0bf39dbfa6a103b259c8a46e5faa06287e8a9f5f41a
+generated: "2026-01-16T20:24:13.173434+02:00"

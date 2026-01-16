@@ -1,0 +1,19 @@
+apiVersion: v2
+name: shopping-system
+description: A microservices shopping application with Kafka and Mongo
+type: application
+
+version: 0.1.0
+
+appVersion: "1.0.0"
+
+dependencies:
+  - name: kafka
+    version: 30.1.8
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: kafka.enabled
+
+  - name: mongodb
+    version: 16.5.45
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: mongodb.enabled

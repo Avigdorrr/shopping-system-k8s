@@ -7,6 +7,7 @@ from core.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 async def init_kafka(app: FastAPI):
     logger.info(f"Connecting to Kafka Producer at {settings.KAFKA_BOOTSTRAP_SERVERS}...")
 
@@ -33,7 +34,6 @@ async def init_kafka(app: FastAPI):
 
 
 async def close_kafka(app: FastAPI):
-
     if hasattr(app.state, "kafka_producer"):
         logger.info("Stopping Kafka producer...")
         await app.state.kafka_producer.stop()

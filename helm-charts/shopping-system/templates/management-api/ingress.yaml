@@ -1,0 +1,43 @@
+{{- if .Values.managementApi.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "shopping-system.management-api.fullname" . }}
+  labels:
+    {{- include "shopping-system.labels" . | nindent 4 }}
+  {{- with .Values.managementApi.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.managementApi.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- if .Values.managementApi.ingress.tls }}
+  tls:
+    {{- range .Values.managementApi.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.managementApi.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- with .pathType }}
+            pathType: {{ . }}
+            {{- end }}
+            backend:
+              service:
+                name: {{ include "shopping-system.management-api.fullname" . }}
+                port:
+                  number: {{ $.Values.managementApi.service.port }}
+          {{- end }}
+    {{- end }}
+{{- end }}

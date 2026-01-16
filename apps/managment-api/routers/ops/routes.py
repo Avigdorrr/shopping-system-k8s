@@ -2,9 +2,11 @@ from fastapi import APIRouter, Request, status, HTTPException
 
 router = APIRouter(tags=["Operations"])
 
-@router.get("/health")
+
+@router.get("/healthy")
 async def liveness_probe():
     return {"status": "alive"}
+
 
 @router.get("/ready")
 async def readiness_probe(request: Request):
@@ -20,5 +22,5 @@ async def readiness_probe(request: Request):
                 "kafka": "up" if kafka_connected else "down"
             }
         )
-    
+
     return {"status": "ready", "mongo": "up", "kafka": "up"}

@@ -1,0 +1,113 @@
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+managementApi:
+  replicaCount: 1
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  volumes: []
+  volumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  service:
+    type: ClusterIP
+    port: 8081
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /-/healthy
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /-/ready
+      port: http
+
+  kedaAutoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    pollingInterval: 30
+    cooldownPeriod: 300
+    kafkaLagThreshold: "10"
+
+  config:
+    kafka:
+      bootstrapServers: kafka-service:9092
+      topic: purchases
+      consumerGroup: management-api-group
+    mongo:
+      connectionString: "mongodb://mongo:27017"
+      database: shopping
+      collection: purchases
+
+webServer:
+  fullnameOverride: ""
+  replicaCount: 1
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: false
+  httpRoute:
+    enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  livenessProbe:
+    httpGet:
+      path: /-/healthy
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /-/ready
+      port: http
+
+kafka:
+  enabled: true
+
+mongo:
+  enabled: true
