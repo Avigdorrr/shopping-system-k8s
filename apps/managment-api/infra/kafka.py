@@ -30,8 +30,9 @@ async def consume_loop(app: FastAPI):
 
 async def init_kafka(app: FastAPI):
     logger.info(f"Connecting to Kafka at {settings.KAFKA_BOOTSTRAP_SERVERS}...")
-    
-    for i in range(1, 6):
+
+    max_retries = 5
+    for attempt in range(1, max_retries + 1):
         try:
             consumer = AIOKafkaConsumer(
                 settings.KAFKA_TOPIC,
@@ -49,7 +50,7 @@ async def init_kafka(app: FastAPI):
             return
             
         except Exception as e:
-            logger.warning(f"Connection attempt {i}/5 failed. Retrying in 5s...")
+            logger.warning(f"Connection attempt {attempt}/{max_retries} failed: {e}. Retrying in 5s...")
             await asyncio.sleep(5)
             
     logger.error("Could not connect to Kafka after retries")

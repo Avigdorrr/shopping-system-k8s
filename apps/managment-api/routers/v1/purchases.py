@@ -5,8 +5,8 @@ from pydantic import BaseModel
 class PurchaseResponse(BaseModel):
     userid: str
     username: str
-    product_name: str
     price: float
+    timestamp: float
 
 router = APIRouter(tags=["Purchases"])
 
