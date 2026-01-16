@@ -132,14 +132,8 @@ webServer:
     httpGet:
       path: /-/ready
       port: http
-
-  kedaAutoscaling:
-    enabled: true
-    minReplicas: 1
-    maxReplicas: 5 
-    pollingInterval: 30
-    cooldownPeriod: 300
-    kafkaLagThreshold: "10"
+  
+  autoscaling: {}
 
 kafka:
   enabled: true
@@ -151,6 +145,7 @@ kafka:
     ports:
       client: 9092
   provisioning:
+    enabled: true
     topics:
       - name: purchases
         partitions: 5

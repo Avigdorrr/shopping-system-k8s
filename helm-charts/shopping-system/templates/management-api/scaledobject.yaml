@@ -15,7 +15,7 @@ spec:
   triggers:
     - type: kafka
       metadata:
-        bootstrapServers: {{ .Release.Name }}-kafka.{{ .Release.Namespace }}.svc:{{ .Values.kafka.service.ports.client }}
+        bootstrapServers: {{ .Release.Name }}-kafka.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.kafka.service.ports.client }}
         topic: {{ (index .Values.kafka.provisioning.topics 0).name }}
         consumerGroup: {{ .Values.managementApi.config.kafka.consumerGroup }}
         lagThreshold: "{{ .Values.managementApi.kedaAutoscaling.kafkaLagThreshold }}"
