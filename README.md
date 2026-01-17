@@ -11,7 +11,7 @@ This project consists of two main microservices:
 
 The infrastructure is managed via Helm charts and utilizes KEDA (Kubernetes Event-driven Autoscaling) to scale the services based on demand.
 
-## Prerequisites
+## Requirements
 
 Before running this project, ensure you have the following installed:
 
