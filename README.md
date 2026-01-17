@@ -6,7 +6,7 @@ A Kubernetes-based shopping system composed of Python microservices, designed to
 
 This project consists of two main microservices:
 
-- **Web Server**: A frontend-facing service.
+- **Web Server**: A frontend-facing service that produces events to Kafka.
 - **Management API**: An internal API for managing system resources, integrating with Kafka and MongoDB.
 
 The infrastructure is managed via Helm charts and utilizes KEDA (Kubernetes Event-driven Autoscaling) to scale the services based on demand.
@@ -24,8 +24,8 @@ Before running this project, ensure you have the following installed:
 ```text
 .
 ├── apps/                       # Source code for microservices
-│   ├── management-api/         # Python FastAPI service (Kafka consumers, MongoDB)
-│   └── web-server/             # Python web server
+│   ├── management-api/         # Python FastAPI service (Kafka consumer, MongoDB)
+│   └── web-server/             # Python web server (Kafka producer)
 ├── helm-chart/                 # Kubernetes deployment configurations
 │   ├── setup-env.sh            # One-click setup script
 │   └── shopping-system/        # Main Helm chart for the application
@@ -77,8 +77,18 @@ If you prefer to deploy manually:
 
 ## Services
 
-- **Web Server**: Handles incoming HTTP requests from users.
+- **Web Server**: Handles incoming HTTP requests from users and produces events to Kafka.
 - **Management API**: Processes background tasks and manages data persistence using MongoDB and Kafka.
+
+## Autoscaling
+
+The system uses [KEDA](https://keda.sh/) (Kubernetes Event-driven Autoscaling) to scale services dynamically based on workload and metrics:
+
+- **Web Server**: Scales based on **CPU utilization**.
+  - **Why?** Since this is a frontend-facing service, high traffic correlates with increased CPU usage. Scaling on CPU ensures the service remains responsive under load.
+
+- **Management API**: Scales based on **Kafka Consumer Lag**.
+  - **Why?** This service processes background events. If the producer (Web Server) generates events faster than the consumer can process them, the "lag" (pending messages) increases. KEDA detects this and adds more pods to drain the queue faster, ensuring eventual consistency.
 
 ## Troubleshooting
 
