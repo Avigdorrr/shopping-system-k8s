@@ -19,6 +19,16 @@ Before running this project, ensure you have the following installed:
 - [Helm](https://helm.sh/) (v3+)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) configured to talk to your cluster
 
+## Helm Chart Deployment
+
+This project uses a [Helm](https://helm.sh/) chart to manage the entire application stack. The chart is designed to simplify deployment by:
+
+1. **Managing Dependencies**: It automatically installs and configures required infrastructure services:
+    - **Kafka**: For event streaming between services.
+    - **MongoDB**: For data persistence.
+2. **Configuration Management**: It centrally handles configuration (ports, topic, autoscaling) through a single `values.yaml` file.
+3. **Service Discovery**: It automatically injects the correct connection strings (Kafka bootstrap servers, MongoDB URIs) into the applications, so they can talk to each other without manual setup.
+
 ## Project Structure
 
 ```text
