@@ -35,7 +35,7 @@ This project uses a [Helm](https://helm.sh/) chart to manage the entire applicat
 .
 ├── apps/                       # Source code for microservices
 │   ├── management-api/         # Python FastAPI service (Kafka consumer, MongoDB)
-│   └── web-server/             # Python web server (Kafka producer)
+│   └── web-server/             # Python FastAPI service (Kafka producer)
 ├── helm-chart/                 # Kubernetes deployment configurations
 │   ├── setup-env.sh            # One-click setup script
 │   └── shopping-system/        # Main Helm chart for the application
