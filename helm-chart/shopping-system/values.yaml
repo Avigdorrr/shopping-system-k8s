@@ -1,0 +1,181 @@
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+managementApi:
+  replicaCount: 1
+  logLevel: INFO
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  volumes: []
+  volumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  image:
+    repository: avigdorrr/management-api
+    pullPolicy: IfNotPresent
+    tag: "1.0.0"
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /-/healthy
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /-/ready
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+
+  kedaAutoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5 # make sure this is equal to the number of partitions in the Kafka topic. higher value than that won't help scale out.
+    pollingInterval: 30
+    cooldownPeriod: 300
+    kafkaLagThreshold: 10
+
+  config:
+    mongodb:
+      collection: purchases
+      database: shopping
+    kafka:
+      consumerGroup: management-api-group
+
+
+
+webServer:
+  replicaCount: 1
+  logLevel: INFO
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  volumes: []
+  volumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  image:
+    repository: avigdorrr/web-server
+    pullPolicy: IfNotPresent
+    tag: "1.0.0"
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  service:
+    type: ClusterIP
+    port: 8081
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /-/healthy
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /-/ready
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+  
+  kedaAutoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    pollingInterval: 15
+    cooldownPeriod: 30
+    cpuThreshold: 80
+
+kafka:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/kafka
+    tag: 3.8.1
+  provisioning:
+    enabled: true
+    topics:
+      - name: purchases
+        partitions: 5
+        replicas: 1
+  listeners:
+    client:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    
+mongodb:
+  image:
+    registry: docker.io
+    repository: bitnami/mongodb
+    tag: latest
+  auth:
+    enabled: false

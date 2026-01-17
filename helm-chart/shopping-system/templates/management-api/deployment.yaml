@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "shopping-system.management-api.fullname" . }}
+  labels:
+    {{- include "shopping-system.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.managementApi.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "shopping-system.management-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.managementApi.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "shopping-system.management-api.selectorLabels" . | nindent 8 }}
+        {{- with .Values.managementApi.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "shopping-system.management-api.serviceAccountName" . }}
+      {{- with .Values.managementApi.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: management-api
+          {{- with .Values.managementApi.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.managementApi.image.repository }}:{{ .Values.managementApi.image.tag }}"
+          imagePullPolicy: {{ .Values.managementApi.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "shopping-system.management-api.fullname" . }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.managementApi.service.port }}
+              protocol: TCP
+          {{- with .Values.managementApi.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.managementApi.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.managementApi.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.managementApi.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.managementApi.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.managementApi.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.managementApi.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.managementApi.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

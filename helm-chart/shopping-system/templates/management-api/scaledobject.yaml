@@ -1,0 +1,22 @@
+{{- if .Values.managementApi.kedaAutoscaling.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "shopping-system.management-api.fullname" . }}
+  labels:
+    {{- include "shopping-system.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ include "shopping-system.management-api.fullname" . }}
+  minReplicaCount: {{ .Values.managementApi.kedaAutoscaling.minReplicas }}
+  maxReplicaCount: {{ .Values.managementApi.kedaAutoscaling.maxReplicas }}
+  pollingInterval: {{ .Values.managementApi.kedaAutoscaling.pollingInterval }}
+  cooldownPeriod: {{ .Values.managementApi.kedaAutoscaling.cooldownPeriod }}
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: {{ include "shopping-system.kafka.bootstrap" . }}
+        topic: {{ (index .Values.kafka.provisioning.topics 0).name }}
+        consumerGroup: {{ .Values.managementApi.config.kafka.consumerGroup }}
+        lagThreshold: "{{ .Values.managementApi.kedaAutoscaling.kafkaLagThreshold }}"
+{{- end }}

@@ -1,0 +1,28 @@
+Thank you for installing the Shopping System!
+
+1. Infrastructure & Dependencies:
+---------------------------------
+This chart has automatically bootstrapped the required infrastructure using Helm sub-charts:
+* MongoDB: Deployed for data persistence.
+* Kafka: Deployed for event streaming.
+
+2. Autoscaling Logic:
+---------------------
+A. Web Server:
+   Scales based on standard CPU Utilization via KEDA.
+   * Trigger: Scales when CPU usage exceeds the defined threshold.
+   * Goal: Handle high volume of incoming HTTP requests.
+
+B. Management API:
+   Scales based on Kafka Lag via KEDA.
+   * Current Max Replicas: {{ .Values.managementApi.kedaAutoscaling.maxReplicas }}
+   * Kafka Topic Partitions: {{ (index .Values.kafka.provisioning.topics 0).partitions }}
+
+   NOTE: The number of active pods will never exceed the number of Kafka partitions.
+   If you need more than {{ (index .Values.kafka.provisioning.topics 0).partitions }} replicas, 
+   please also upgrade the chart's kafka topic with a higher partition count.
+
+3. Get Started:
+---------------
+The system is now up and running!
+To access the application, simply run a 'kubectl port-forward' to the Web Server on port {{ .Values.webServer.service.port }}.

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "shopping-system.web-server.fullname" . }}
+  labels:
+    {{- include "shopping-system.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.webServer.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "shopping-system.web-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.webServer.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "shopping-system.web-server.selectorLabels" . | nindent 8 }}
+        {{- with .Values.webServer.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "shopping-system.web-server.serviceAccountName" . }}
+      {{- with .Values.webServer.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: web-server
+          {{- with .Values.webServer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.webServer.image.repository }}:{{ .Values.webServer.image.tag }}"
+          imagePullPolicy: {{ .Values.webServer.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "shopping-system.web-server.fullname" . }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.webServer.service.port }}
+              protocol: TCP
+          {{- with .Values.webServer.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.webServer.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.webServer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.webServer.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.webServer.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webServer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

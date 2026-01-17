@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "shopping-system.web-server.fullname" . }}
+  labels:
+    {{- include "shopping-system.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.webServer.service.type }}
+  ports:
+    - port: {{ .Values.webServer.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "shopping-system.web-server.selectorLabels" . | nindent 4 }}

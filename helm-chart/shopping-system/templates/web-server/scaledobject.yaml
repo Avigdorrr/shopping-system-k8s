@@ -1,0 +1,20 @@
+{{- if .Values.webServer.kedaAutoscaling.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "shopping-system.web-server.fullname" . }}
+  labels:
+    {{- include "shopping-system.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ include "shopping-system.web-server.fullname" . }}
+  minReplicaCount: {{ .Values.webServer.kedaAutoscaling.minReplicas }}
+  maxReplicaCount: {{ .Values.webServer.kedaAutoscaling.maxReplicas }}
+  pollingInterval: {{ .Values.webServer.kedaAutoscaling.pollingInterval }}
+  cooldownPeriod: {{ .Values.webServer.kedaAutoscaling.cooldownPeriod }}
+  triggers:
+    - type: cpu
+      metricType: Utilization
+      metadata:
+        value: "{{ .Values.webServer.kedaAutoscaling.cpuThreshold }}"
+{{- end }}
