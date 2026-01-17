@@ -1,7 +1,9 @@
 import time
+from decimal import Decimal
+
 import aiohttp
 from fastapi import APIRouter, HTTPException, Request, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from core.config import settings
 from core.logger import get_logger
 
@@ -12,11 +14,19 @@ logger = get_logger("web-server-router")
 class PurchaseRequest(BaseModel):
     username: str
     userid: str
-    price: float
+    price: Decimal = Field(gt=0, decimal_places=2)
 
 
 @router.post("/buy", status_code=status.HTTP_202_ACCEPTED)
 async def buy_item(purchase: PurchaseRequest, request: Request):
+    """
+        Handles purchase requests via HTTP and publishes events to Kafka.
+
+        Design Choice:
+        - We use send_and_wait to ensure the message is persisted in Kafka
+          before returning a success response to the client.
+        - Returns 202 Accepted because the actual processing happens asynchronously.
+        """
     if not hasattr(request.app.state, "kafka_producer"):
         logger.error("Kafka producer is not initialized")
         raise HTTPException(status_code=503, detail="Service Unavailable")
@@ -24,6 +34,7 @@ async def buy_item(purchase: PurchaseRequest, request: Request):
     producer = request.app.state.kafka_producer
 
     try:
+        # Generating TS and producing an event
         purchase_data: dict = purchase.model_dump()
         purchase_data['timestamp'] = time.time()
 
@@ -47,6 +58,11 @@ async def buy_item(purchase: PurchaseRequest, request: Request):
 
 @router.get("/getAllUserBuys/{userid}")
 async def get_user_history(userid: str):
+    """
+    Proxies read requests to the Management API.
+    - Maps backend 404 errors to empty list [].
+    - Enforces a 5s timeout to prevent hanging requests.
+    """
     target_url = f"http://{settings.MANAGEMENT_API_ENDPOINT}/api/v1/purchases/{userid}"
 
     try:
@@ -54,8 +70,6 @@ async def get_user_history(userid: str):
             async with session.get(target_url, timeout=5) as response:
                 if response.status == 200:
                     return await response.json()
-                if response.status == 404:
-                    return []
 
                 logger.error(f"Management API error: {response.status}")
                 raise HTTPException(status_code=response.status, detail="Failed to fetch history")

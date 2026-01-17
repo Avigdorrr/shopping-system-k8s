@@ -18,20 +18,25 @@ logger = get_logger("management-api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Manages the lifecycle of infrastructure connections.
+    """
     logger.info("Application is starting up")
-    asyncio.create_task(init_kafka(app))
-    asyncio.create_task(init_mongo(app))
+    asyncio.create_task(init_kafka(app)) # Runs the Consumer infinite loop. Must be a task to avoid blocking the API.
+    asyncio.create_task(init_mongo(app)) # Initialized in parallel to speed up startup time.
+
     yield
 
     logger.info("Application is shutting down")
+    # Close connections
     await close_kafka(app)
     await close_mongo(app)
 
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(v1_router)
-app.include_router(ops_router)
+app.include_router(v1_router) # App logic routes
+app.include_router(ops_router) # Liveness/Readiness probes
 
 
 def main():

@@ -7,6 +7,11 @@ logger = get_logger(__name__)
 
 
 async def init_mongo(app: FastAPI):
+    """
+    Initializes MongoDB connection with a strict Retry Pattern.
+    Uses an infinite loop to keep trying to connect until connection succeeds.
+    Essential for Kubernetes/Docker environments where MongoDB might take longer to start than this service.
+    """
     mongo_uri = f"mongodb://{settings.MONGO_HOSTNAME}:{settings.MONGO_PORT}/"
     logger.info(f"Connecting to MongoDB at {mongo_uri}...")
 
@@ -14,6 +19,7 @@ async def init_mongo(app: FastAPI):
         try:
             client = AsyncIOMotorClient(mongo_uri)
 
+            # throws an exception if connection fails
             await client.server_info()
 
             app.state.mongo_client = client
@@ -28,6 +34,7 @@ async def init_mongo(app: FastAPI):
 
 
 async def close_mongo(app: FastAPI):
+    """ Close the mongo client """
     if hasattr(app.state, "mongo_client"):
         logger.info("Closing MongoDB connection...")
         app.state.mongo_client.close()

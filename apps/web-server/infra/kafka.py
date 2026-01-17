@@ -9,6 +9,11 @@ logger = get_logger(__name__)
 
 
 async def init_kafka(app: FastAPI):
+    """
+    Initializes the Kafka Producer with a Retry Pattern.
+    Uses an infinite loop to keep trying until connection succeeds.
+    Essential for Kubernetes/Docker environments where Kafka might take longer to start than this service.
+    """
     logger.info(f"Connecting to Kafka Producer at {settings.KAFKA_BOOTSTRAP_SERVERS}...")
 
     while True:
@@ -30,6 +35,7 @@ async def init_kafka(app: FastAPI):
 
 
 async def close_kafka(app: FastAPI):
+    """ stop the Kafka producer """
     if hasattr(app.state, "kafka_producer"):
         logger.info("Stopping Kafka producer...")
         await app.state.kafka_producer.stop()

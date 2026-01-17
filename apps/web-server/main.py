@@ -15,19 +15,25 @@ logger = get_logger("management-api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Manages the lifecycle of infrastructure connections.
+    """
     logger.info("Application is starting up")
+
+    # Init kafka connection for event streaming.
     asyncio.create_task(init_kafka(app))
 
     yield
 
+    # Close connection
     logger.info("Application is shutting down")
     await close_kafka(app)
 
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(v1_router)
-app.include_router(ops_router)
+app.include_router(v1_router) # App logic routes
+app.include_router(ops_router) # Liveness/Readiness probes
 
 
 def main():

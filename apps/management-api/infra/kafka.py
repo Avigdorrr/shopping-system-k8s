@@ -9,6 +9,11 @@ logger = get_logger(__name__)
 
 
 async def consume_loop(app: FastAPI):
+    """
+    Continuously listens for new Kafka messages.
+    Deserializes data and inserts it directly into MongoDB.
+    Includes error handling inside the loop so one bad message doesn't crash the entire worker.
+    """
     consumer = app.state.kafka_consumer
     collection = app.state.collection
 
@@ -31,6 +36,12 @@ async def consume_loop(app: FastAPI):
 
 
 async def init_kafka(app: FastAPI):
+    """
+    Initializes the Consumer and spawns the background worker.
+    Uses an infinite loop to keep trying to connect until connection succeeds.
+    Once connected, it launches consume_loop as a non-blocking asyncio task.
+    This allows the FastAPI app to serve HTTP requests while processing messages.
+    """
     logger.info(f"Connecting to Kafka at {settings.KAFKA_BOOTSTRAP_SERVERS}...")
 
     while True:
@@ -56,6 +67,7 @@ async def init_kafka(app: FastAPI):
 
 
 async def close_kafka(app: FastAPI):
+    """ stop the Kafka consumer """
     if hasattr(app.state, "consumer_task"):
         app.state.consumer_task.cancel()
 
