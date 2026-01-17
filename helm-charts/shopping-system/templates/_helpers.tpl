@@ -101,3 +101,11 @@ Create the name of the service account for Web Server
 {{- default "default" .Values.webServer.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "shopping-system.kafka.bootstrap" -}}
+{{- $kafka := .Subcharts.kafka -}}
+{{- $name := include "common.names.fullname" $kafka -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $port := $kafka.Values.service.ports.client -}}
+{{- printf "%s.%s.svc.cluster.local:%v" $name $namespace $port -}}
+{{- end -}}

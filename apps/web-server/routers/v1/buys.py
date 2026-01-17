@@ -47,7 +47,7 @@ async def buy_item(purchase: PurchaseRequest, request: Request):
 
 @router.get("/getAllUserBuys/{userid}")
 async def get_user_history(userid: str):
-    target_url = f"{settings.MANAGEMENT_API_URL}/api/v1/purchases/{userid}"
+    target_url = f"http://{settings.MANAGEMENT_API_ENDPOINT}/api/v1/purchases/{userid}"
 
     try:
         async with aiohttp.ClientSession() as session:

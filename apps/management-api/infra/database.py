@@ -10,20 +10,21 @@ async def init_mongo(app: FastAPI):
     mongo_uri = f"mongodb://{settings.MONGO_HOSTNAME}:{settings.MONGO_PORT}/"
     logger.info(f"Connecting to MongoDB at {mongo_uri}...")
 
-    try:
-        client = AsyncIOMotorClient(mongo_uri)
+    while True:
+        try:
+            client = AsyncIOMotorClient(mongo_uri)
 
-        await client.server_info()
+            await client.server_info()
 
-        app.state.mongo_client = client
-        app.state.db = client[settings.MONGO_DB_NAME]
-        app.state.collection = app.state.db[settings.MONGO_COLLECTION_NAME]
+            app.state.mongo_client = client
+            app.state.db = client[settings.MONGO_DB_NAME]
+            app.state.collection = app.state.db[settings.MONGO_COLLECTION_NAME]
 
-        logger.info("MongoDB connected successfully")
+            logger.info("MongoDB connected successfully")
+            return
 
-    except Exception as e:
-        logger.error(f"Failed to connect to MongoDB: {e}")
-        raise e
+        except Exception as e:
+            logger.warning(f"Failed to connect to MongoDB: {e}. Retrying in 5 seconds...")
 
 
 async def close_mongo(app: FastAPI):

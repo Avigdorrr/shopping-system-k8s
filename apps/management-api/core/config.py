@@ -13,8 +13,9 @@ class Settings(BaseSettings):
     MONGO_DB_NAME: str = "shopping"
     MONGO_COLLECTION_NAME: str = "purchases"
 
-    # Logging Configuration
+    # App Configuration
     LOG_LEVEL: str = "INFO"
+    APP_PORT: int = 8080
 
 
 settings = Settings()

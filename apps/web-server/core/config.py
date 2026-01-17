@@ -7,10 +7,12 @@ class Settings(BaseSettings):
     KAFKA_TOPIC: str = "purchases"
 
     # Management API Configuration
-    MANAGEMENT_API_URL: str = "http://localhost:8080"
+    MANAGEMENT_API_ENDPOINT: str = "localhost:8080"
 
-    # Logging Configuration
+    # App Configuration
     LOG_LEVEL: str = "INFO"
+    APP_PORT: int = 8081
+
 
 
 settings = Settings()

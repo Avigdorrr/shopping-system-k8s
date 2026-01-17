@@ -5,6 +5,8 @@ import sys
 import uvicorn
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
+from core.config import settings
 from routers.v1 import v1_router
 from routers.ops import ops_router
 from infra.database import init_mongo, close_mongo
@@ -17,10 +19,8 @@ logger = get_logger("management-api")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application is starting up")
-    await asyncio.gather(
-        init_mongo(app),
-        init_kafka(app)
-    )
+    asyncio.create_task(init_kafka(app))
+    asyncio.create_task(init_mongo(app))
     yield
 
     logger.info("Application is shutting down")
@@ -35,7 +35,7 @@ app.include_router(ops_router)
 
 
 def main():
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=settings.APP_PORT)
 
 
 if __name__ == "__main__":

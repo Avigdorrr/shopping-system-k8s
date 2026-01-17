@@ -5,10 +5,10 @@ metadata:
   labels:
     {{- include "shopping-system.labels" . | nindent 4 }}
 data:
-
+  APP_PORT: "{{ .Values.webServer.service.port }}"
   LOG_LEVEL: {{ .Values.webServer.logLevel }}  
   # Kafka Configs
-  KAFKA_BOOTSTRAP_SERVERS: {{ .Release.Name }}-kafka.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.kafka.service.ports.client }}
+  KAFKA_BOOTSTRAP_SERVERS: {{ include "shopping-system.kafka.bootstrap" . }}
   KAFKA_TOPIC: {{ (index .Values.kafka.provisioning.topics 0).name }}
-  MANAGEMENT_API_URL: http://{{ .Release.Name }}-management-api.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.managementApi.service.port }}
+  MANAGEMENT_API_ENDPOINT: {{ include "shopping-system.management-api.fullname" . }}:{{ .Values.managementApi.service.port }}
 

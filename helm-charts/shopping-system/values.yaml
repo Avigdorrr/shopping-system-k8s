@@ -19,7 +19,7 @@ managementApi:
   image:
     repository: management-api
     pullPolicy: IfNotPresent
-    tag: "1.0.0"
+    tag: "1.0.1"
 
   serviceAccount:
     create: true
@@ -54,10 +54,16 @@ managementApi:
     httpGet:
       path: /-/healthy
       port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
   readinessProbe:
     httpGet:
       path: /-/ready
       port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
 
   kedaAutoscaling:
     enabled: true
@@ -93,7 +99,7 @@ webServer:
   image:
     repository: web-server
     pullPolicy: IfNotPresent
-    tag: "1.0.0"
+    tag: "1.0.1"
 
   serviceAccount:
     create: true
@@ -128,22 +134,24 @@ webServer:
     httpGet:
       path: /-/healthy
       port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
   readinessProbe:
     httpGet:
       path: /-/ready
       port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
   
   autoscaling: {}
 
 kafka:
-  enabled: true
   image:
     registry: docker.io
     repository: bitnamilegacy/kafka
     tag: 3.8.1
-  service:
-    ports:
-      client: 9092
   provisioning:
     enabled: true
     topics:
@@ -159,14 +167,10 @@ kafka:
       protocol: PLAINTEXT
     
 mongodb:
-  enabled: true
   image:
     registry: docker.io
     repository: bitnami/mongodb
     tag: latest
-  service:
-    ports:
-      mongodb: 27017
   auth:
     enabled: false
   # auth:
