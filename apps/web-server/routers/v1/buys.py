@@ -14,7 +14,7 @@ logger = get_logger("web-server-router")
 class PurchaseRequest(BaseModel):
     username: str
     userid: str
-    price: Decimal = Field(gt=0, decimal_places=2)
+    price: float
 
 
 @router.post("/buy", status_code=status.HTTP_202_ACCEPTED)
