@@ -11,10 +11,7 @@ async def liveness_probe():
 
 @router.get("/ready")
 async def readiness_probe(request: Request):
-    """
-    Checks dependency health (Kafka and MongoDB) to determine if the container is ready.).
-    Returns 503 to stop traffic if a dependency is missing.
-    """
+    """Checks dependencies health (Kafka and MongoDB)"""
     mongo_connected = hasattr(request.app.state, "mongo_client")
     kafka_connected = hasattr(request.app.state, "kafka_consumer")
 

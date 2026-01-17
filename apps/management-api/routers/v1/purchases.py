@@ -16,12 +16,7 @@ router = APIRouter(tags=["Purchases"])
 @router.get("/purchases/{userid}", response_model=List[PurchaseResponse])
 async def get_user_history(userid: str, request: Request):
     """
-    Fetches purchase history directly from MongoDB.
-
-    Behavior:
-    - Returns 200 OK with the list of items found.
-    - If no items are found, MongoDB returns an empty list [], not a 404 error.
-    - Sort by _id descending to show the newest purchases first.
+    Fetches purchase history of a user directly from MongoDB.
     """
     if not hasattr(request.app.state, "collection"):
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Database not initialized")

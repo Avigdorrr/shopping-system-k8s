@@ -9,10 +9,7 @@ async def liveness_probe():
 
 @router.get("/ready")
 async def readiness_probe(request: Request):
-    """
-    Checks dependency health (Kafka).
-    Returns 503 to stop traffic if the producer isn't connected yet.
-    """
+    """Checks dependency health (Kafka)."""
     if not hasattr(request.app.state, "kafka_producer"):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

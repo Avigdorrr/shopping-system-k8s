@@ -19,14 +19,7 @@ class PurchaseRequest(BaseModel):
 
 @router.post("/buy", status_code=status.HTTP_202_ACCEPTED)
 async def buy_item(purchase: PurchaseRequest, request: Request):
-    """
-        Handles purchase requests via HTTP and publishes events to Kafka.
-
-        Design Choice:
-        - We use send_and_wait to ensure the message is persisted in Kafka
-          before returning a success response to the client.
-        - Returns 202 Accepted because the actual processing happens asynchronously.
-        """
+    """Handles purchase requests via HTTP and publishes events to Kafka."""
     if not hasattr(request.app.state, "kafka_producer"):
         logger.error("Kafka producer is not initialized")
         raise HTTPException(status_code=503, detail="Service Unavailable")
@@ -40,6 +33,8 @@ async def buy_item(purchase: PurchaseRequest, request: Request):
 
         logger.info(f"Producing event: {purchase_data}")
 
+        # We use send_and_wait to ensure the message is persisted in Kafka
+        # before returning a success response to the client.
         await producer.send_and_wait(
             topic=settings.KAFKA_TOPIC,
             value=purchase_data
@@ -58,11 +53,7 @@ async def buy_item(purchase: PurchaseRequest, request: Request):
 
 @router.get("/getAllUserBuys/{userid}")
 async def get_user_history(userid: str):
-    """
-    Proxies read requests to the Management API.
-    - Maps backend 404 errors to empty list [].
-    - Enforces a 5s timeout to prevent hanging requests.
-    """
+    """Proxies read requests to the Management API to get the purchases history of a user."""
     target_url = f"http://{settings.MANAGEMENT_API_ENDPOINT}/api/v1/purchases/{userid}"
 
     try:
