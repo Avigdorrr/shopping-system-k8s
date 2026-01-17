@@ -5,6 +5,7 @@ A Kubernetes-based shopping system composed of Python microservices, designed to
 ## Overview
 
 This project consists of two main microservices:
+
 - **Web Server**: A frontend-facing service.
 - **Management API**: An internal API for managing system resources, integrating with Kafka and MongoDB.
 
@@ -13,6 +14,7 @@ The infrastructure is managed via Helm charts and utilizes KEDA (Kubernetes Even
 ## Prerequisites
 
 Before running this project, ensure you have the following installed:
+
 - [Kubernetes](https://kubernetes.io/) cluster (e.g., Minikube, Kind, Docker Desktop, or a remote cluster)
 - [Helm](https://helm.sh/) (v3+)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) configured to talk to your cluster
@@ -37,14 +39,17 @@ Before running this project, ensure you have the following installed:
 A setup script is provided to install necessary dependencies (like KEDA) and deploy the application.
 
 1. Navigate to the `helm-chart` directory:
+
    ```bash
    cd helm-chart
    ```
 
 2. Run the setup script:
+
    ```bash
    ./setup-env.sh
    ```
+
    This script will:
    - Install KEDA into the `keda` namespace.
    - Build Helm dependencies.
@@ -55,6 +60,7 @@ A setup script is provided to install necessary dependencies (like KEDA) and dep
 If you prefer to deploy manually:
 
 1. **Install KEDA**:
+
    ```bash
    helm repo add kedacore https://kedacore.github.io/charts
    helm repo update
@@ -62,6 +68,7 @@ If you prefer to deploy manually:
    ```
 
 2. **Deploy Application**:
+
    ```bash
    cd helm-chart/shopping-system
    helm dependency build .
@@ -76,10 +83,13 @@ If you prefer to deploy manually:
 ## Troubleshooting
 
 - Check the status of the pods:
+
   ```bash
   kubectl get pods -n shopping-system
   ```
+
 - View logs for a specific service:
+
   ```bash
   kubectl logs -f <pod-name> -n shopping-system
   ```
