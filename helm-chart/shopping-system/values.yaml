@@ -68,7 +68,7 @@ managementApi:
   kedaAutoscaling:
     enabled: true
     minReplicas: 1
-    maxReplicas: 5 # make sure this is equal to the number of partitions in the Kafka topic
+    maxReplicas: 5 # make sure this is equal to the number of partitions in the Kafka topic. higher value than that won't help scale out.
     pollingInterval: 30
     cooldownPeriod: 300
     kafkaLagThreshold: 10
@@ -145,7 +145,13 @@ webServer:
     periodSeconds: 10
     failureThreshold: 3
   
-  autoscaling: {}
+  kedaAutoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    pollingInterval: 15
+    cooldownPeriod: 30
+    cpuThreshold: 80
 
 kafka:
   image:
@@ -173,16 +179,3 @@ mongodb:
     tag: latest
   auth:
     enabled: false
-  # auth:
-  #   database: shopping
-
-# used only if kafka.enabled is false
-# externalKafka:
-#   bootstrapServers: "kafka:9092"
-#   topic: purchases
-
-# used only if mongo.enabled is false
-# externalMongodb:
-#   connectionString: "mongodb://mongo:27017"
-#   database: shopping
-#   collection: purchases
