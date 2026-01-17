@@ -17,9 +17,9 @@ managementApi:
   affinity: {}
 
   image:
-    repository: management-api
+    repository: avigdorrr/management-api
     pullPolicy: IfNotPresent
-    tag: "1.0.1"
+    tag: "1.0.0"
 
   serviceAccount:
     create: true
@@ -97,9 +97,9 @@ webServer:
   affinity: {}
 
   image:
-    repository: web-server
+    repository: avigdorrr/web-server
     pullPolicy: IfNotPresent
-    tag: "1.0.1"
+    tag: "1.0.0"
 
   serviceAccount:
     create: true
