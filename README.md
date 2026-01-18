@@ -100,6 +100,30 @@ The system uses [KEDA](https://keda.sh/) (Kubernetes Event-driven Autoscaling) t
 - **Management API**: Scales based on **Kafka Consumer Lag**.
   - **Why?** This service processes background events. If the producer (Web Server) generates events faster than the consumer can process them, the "lag" (pending messages) increases. KEDA detects this and adds more pods to drain the queue faster, ensuring eventual consistency.
 
+## CI/CD Pipeline
+
+The project includes a comprehensive CI/CD pipeline using **GitHub Actions**.
+
+### Workflow
+
+1. **Testing**:
+    - On every push to `main`, the pipeline runs simple health checks (`pytest`) for both `management-api` and `web-server`.
+    - Tests are run using **Python 3.14** to ensure compatibility with the deployment environment.
+
+2. **Build & Push**:
+    - If tests pass, the pipeline builds Docker images for both services.
+    - Images are built for multiple platforms (**linux/amd64** and **linux/arm64**).
+        - **Why?** This ensures native performance and compatibility with **Apple Silicon (M1/M2/M3)** chips, which is the hardware used to develop and test this project.
+    - Images are pushed to Docker Hub with two tags:
+        - `latest`
+        - `sha-<git-short-sha>`
+
+3. **Deployment Instructions**:
+    - The development environment for this project is **Minikube**.
+    - Since the GitHub Actions runner cannot access the local Minikube cluster, the pipeline skips auto-deployment.
+    - Instead, it outputs the exact **Helm** commands needed to deploy the specific version built by the CI.
+    - You can copy these commands from the GitHub Actions logs to deploy the newly built images to your local cluster.
+
 ## Troubleshooting
 
 - Check the status of the pods:
