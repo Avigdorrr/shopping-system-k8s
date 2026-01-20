@@ -124,6 +124,122 @@ The project includes a comprehensive CI/CD pipeline using **GitHub Actions**.
     - Instead, it outputs the exact **Helm** commands needed to deploy the specific version built by the CI.
     - You can copy these commands from the GitHub Actions logs to deploy the newly built images to your local cluster.
 
+## Testing the System
+
+Once the system is running, you can interact with the services using **curl**, **Postman**, or **Swagger UI**.
+
+### Accessing the Services
+
+To access the services locally, you can use `kubectl port-forward`.
+
+> **Note**: The service names depend on the Helm release name you used. If you followed the instructions and used `my-assignment`, the names will be as follows. If you used a different name, check `kubectl get svc -n shopping-system`.
+
+```bash
+# Web Server (Port 8081)
+kubectl port-forward svc/my-assignment-shopping-system-web-server 8081:8081 -n shopping-system
+
+# Management API (Port 8080)
+kubectl port-forward svc/my-assignment-shopping-system-management-api 8080:8080 -n shopping-system
+```
+
+### Swagger UI
+
+Both services provide interactive API documentation via Swagger UI, available at `/docs`:
+
+- **Web Server**: [http://localhost:8081/docs](http://localhost:8081/docs)
+- **Management API**: [http://localhost:8080/docs](http://localhost:8080/docs)
+
+### API Endpoints
+
+#### 1. Simulate a Purchase
+
+**Endpoint**: `POST /api/v1/buy` (Web Server)
+
+This endpoint accepts a purchase request and publishes an event to Kafka.
+
+**Request Body**:
+
+```json
+{
+  "username": "user1",
+  "userid": "123",
+  "price": 50.0
+}
+```
+
+**Response Example** (`202 Accepted`):
+
+```json
+{
+  "status": "success",
+  "message": "Purchase recorded",
+  "data": {
+    "username": "user1",
+    "userid": "123",
+    "price": 50.0,
+    "timestamp": 1705663200.123456
+  }
+}
+```
+
+**curl Example**:
+
+```bash
+curl -X POST "http://localhost:8081/api/v1/buy" \
+     -H "Content-Type: application/json" \
+     -d '{"username": "user1", "userid": "123", "price": 50.0}'
+```
+
+#### 2. Get User Purchase History (via Web Server)
+
+**Endpoint**: `GET /api/v1/getAllUserBuys/{userid}` (Web Server)
+
+This endpoint proxies the request to the Management API to retrieve the user's purchase history.
+
+**Response Example** (`200 OK`):
+
+```json
+[
+  {
+    "userid": "123",
+    "username": "user1",
+    "price": 50.0,
+    "timestamp": 1705663200.123456
+  }
+]
+```
+
+**curl Example**:
+
+```bash
+curl -X GET "http://localhost:8081/api/v1/getAllUserBuys/123"
+```
+
+#### 3. Get User Purchase History (Directly from Management API)
+
+**Endpoint**: `GET /api/v1/purchases/{userid}` (Management API)
+
+You can also query the Management API directly if you have port-forwarded it.
+
+**Response Example** (`200 OK`):
+
+```json
+[
+  {
+    "userid": "123",
+    "username": "user1",
+    "price": 50.0,
+    "timestamp": 1705663200.123456
+  }
+]
+```
+
+**curl Example**:
+
+```bash
+curl -X GET "http://localhost:8080/api/v1/purchases/123"
+```
+
 ## Troubleshooting
 
 - Check the status of the pods:
